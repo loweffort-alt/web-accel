@@ -42,7 +42,7 @@ function App() {
         console.error(error);
       });
     const fetchData = async () => {
-      const res = await fetch("http://localhost:3001/proxy");
+      const res = await fetch("https://server-acce.onrender.com/proxy");
       const data = await res.json();
       setDataIGP(data[0]);
     };
