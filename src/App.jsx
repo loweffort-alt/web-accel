@@ -9,6 +9,7 @@ function App() {
   const [sensorData, setSensorData] = useState({});
   const [dataIGP, setDataIGP] = useState([]);
   const [maxValues, setMaxValues] = useState([]);
+  const [startTime, setStartTime] = useState([]);
 
   useEffect(() => {
     get(child(database, "data"))
@@ -33,6 +34,7 @@ function App() {
             Math.max(Math.abs(acc), Math.abs(el)),
           );
           setMaxValues([maxValueX, maxValueY, maxValueZ]);
+          setStartTime(Object.values(wea)[0].currentTime);
           setSensorData(wea);
         } else {
           console.log("No data available");
@@ -70,7 +72,7 @@ function App() {
       <p>Fuente: IGP</p>
 
       <h2>3. Información sobre el registro</h2>
-      <p>Hora de inicio (UTC-0): </p>
+      <p>Hora de inicio (UTC-0): {startTime}</p>
       <p>Número de datos: {Object.entries(sensorData).length}</p>
       <p>Unidad: cm/s2</p>
       <p>
