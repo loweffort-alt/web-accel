@@ -1,55 +1,55 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 import { app } from "./realtimeData/index";
 import { getDatabase, ref, child, get } from "firebase/database";
 
-function App() {
-  const database = ref(getDatabase(app));
+function fetchDataFromFirebase(databaseRef) {
+  return get(child(databaseRef, "data")).then((snapshot) => {
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      const allData = Object.values(data).map((el) => ({
+        dataX: parseFloat(el.dataX),
+        dataY: parseFloat(el.dataY),
+        dataZ: parseFloat(el.dataZ),
+        currentTime: el.currentTime,
+      }));
+      const maxValues = ["dataX", "dataY", "dataZ"].map((axis) =>
+        Math.max(...allData.map((entry) => Math.abs(entry[axis]))),
+      );
+      const startTime = allData.length > 0 ? allData[0].currentTime : null;
+      return { sensorData: allData, maxValues, startTime };
+    } else {
+      throw new Error("No data available");
+    }
+  });
+}
 
-  const [sensorData, setSensorData] = useState({});
-  const [dataIGP, setDataIGP] = useState([]);
+function fetchDataFromExternalAPI(setDataIGP) {
+  fetch("https://server-acce.onrender.com/proxy")
+    .then((res) => res.json())
+    .then((data) => setDataIGP(data[0]))
+    .catch((error) =>
+      console.error("Error fetching data from external API:", error),
+    );
+}
+
+function App() {
+  const databaseRef = ref(getDatabase(app));
+  const [sensorData, setSensorData] = useState([]);
+  const [dataIGP, setDataIGP] = useState({});
   const [maxValues, setMaxValues] = useState([]);
-  const [startTime, setStartTime] = useState([]);
+  const [startTime, setStartTime] = useState(null);
 
   useEffect(() => {
-    get(child(database, "data"))
-      .then((snapshot) => {
-        if (snapshot.exists()) {
-          const wea = snapshot.val();
-          const allDataX = [];
-          const allDataY = [];
-          const allDataZ = [];
-          Object.values(wea).forEach((el) => {
-            allDataX.push(parseFloat(el.dataX));
-            allDataY.push(parseFloat(el.dataY));
-            allDataZ.push(parseFloat(el.dataZ));
-          });
-          const maxValueX = allDataX.reduce((acc, el) =>
-            Math.max(Math.abs(acc), Math.abs(el)),
-          );
-          const maxValueY = allDataY.reduce((acc, el) =>
-            Math.max(Math.abs(acc), Math.abs(el)),
-          );
-          const maxValueZ = allDataZ.reduce((acc, el) =>
-            Math.max(Math.abs(acc), Math.abs(el)),
-          );
-          setMaxValues([maxValueX, maxValueY, maxValueZ]);
-          setStartTime(Object.values(wea)[0].currentTime);
-          setSensorData(wea);
-        } else {
-          console.log("No data available");
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-    const fetchData = async () => {
-      const res = await fetch("https://server-acce.onrender.com/proxy");
-      const data = await res.json();
-      setDataIGP(data[0]);
-    };
-    fetchData();
-  }, []);
+    fetchDataFromFirebase(databaseRef).then(
+      ({ sensorData, maxValues, startTime }) => {
+        setSensorData(sensorData);
+        setMaxValues(maxValues);
+        setStartTime(startTime);
+      },
+    );
+    fetchDataFromExternalAPI(setDataIGP);
+  }, [databaseRef]);
 
   return (
     <>
@@ -74,7 +74,7 @@ function App() {
 
       <h2>3. Información sobre el registro</h2>
       <p>Hora de inicio (UTC-0): {startTime}</p>
-      <p>Número de datos: {Object.entries(sensorData).length}</p>
+      <p>Número de datos: {sensorData.length}</p>
       <p>Unidad: cm/s2</p>
       <p>
         Aceleraciones máximas: {maxValues[0]} {maxValues[1]} {maxValues[2]}
@@ -94,12 +94,12 @@ function App() {
             </tr>
           </thead>
           <tbody>
-            {Object.entries(sensorData).map(([id, val]) => (
-              <tr key={id}>
-                <td>{val.dataX}</td>
-                <td>{val.dataY}</td>
-                <td>{val.dataZ}</td>
-                <td>{val.currentTime}</td>
+            {sensorData.map((entry, index) => (
+              <tr key={index}>
+                <td>{entry.dataX}</td>
+                <td>{entry.dataY}</td>
+                <td>{entry.dataZ}</td>
+                <td>{entry.currentTime}</td>
               </tr>
             ))}
           </tbody>
