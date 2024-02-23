@@ -69,6 +69,7 @@ function App() {
       <p>Longitud: {dataIGP.Longitud}</p>
       <p>Profundidad (Km): {dataIGP.Profundidad}</p>
       <p>Magnitud: {dataIGP.Magnitud}</p>
+      <p>Referencia: {dataIGP.Referencia}</p>
       <p>Fuente: IGP</p>
 
       <h2>3. Información sobre el registro</h2>
@@ -89,6 +90,7 @@ function App() {
               <th>Eje X</th>
               <th>Eje Y</th>
               <th>Eje Z</th>
+              <th>Registered time</th>
             </tr>
           </thead>
           <tbody>
@@ -97,6 +99,7 @@ function App() {
                 <td>{val.dataX}</td>
                 <td>{val.dataY}</td>
                 <td>{val.dataZ}</td>
+                <td>{val.currentTime}</td>
               </tr>
             ))}
           </tbody>
