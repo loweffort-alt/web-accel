@@ -3,23 +3,23 @@ import { getDatabase, ref, child, get } from "firebase/database";
 
 const databaseRef = ref(getDatabase(app));
 
-export function fetchDataFromFirebase() {
-  return get(child(databaseRef, "data")).then((snapshot) => {
-    if (snapshot.exists()) {
-      const data = snapshot.val();
-      const allData = Object.values(data).map((el) => ({
-        dataX: parseFloat(el.dataX),
-        dataY: parseFloat(el.dataY),
-        dataZ: parseFloat(el.dataZ),
-        currentTime: el.currentTime,
-      }));
-      const maxValues = ["dataX", "dataY", "dataZ"].map((axis) =>
-        Math.max(...allData.map((entry) => Math.abs(entry[axis]))),
-      );
-      const startTime = allData.length > 0 ? allData[0].currentTime : null;
-      return { sensorData: allData, maxValues, startTime };
-    } else {
-      throw new Error("No data available");
-    }
-  });
+export async function fetchDataFromFirebase() {
+  const snapshot = await get(child(databaseRef, "data"));
+  if (snapshot.exists()) {
+    const rawData = snapshot.val();
+    const filteredData = Object.values(rawData).map((el) => ({
+      dataX: parseFloat(el.dataX),
+      dataY: parseFloat(el.dataY),
+      dataZ: parseFloat(el.dataZ),
+      currentTime: el.currentTime,
+    }));
+    const maxValues = ["dataX", "dataY", "dataZ"].map((axis) =>
+      Math.max(...filteredData.map((entry) => Math.abs(entry[axis]))),
+    );
+    const startTime =
+      filteredData.length > 0 ? filteredData[0].currentTime : null;
+    return { sensorData: filteredData, maxValues, startTime };
+  } else {
+    throw new Error("No data available");
+  }
 }
