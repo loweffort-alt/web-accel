@@ -104,7 +104,7 @@ export const FirebaseData = () => {
         </div>
       </div>
 
-      <div className="mt-5 flex flex-col">
+      <div className="mt-5 flex flex-col items-center">
         <button
           type="button"
           className="mb-10 text-white hover:text-white border border-white hover:bg-gray-900 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800"
@@ -115,7 +115,7 @@ export const FirebaseData = () => {
 
         {showData && (
           <div>
-            <table className="border-separate border-spacing-x-10 border-spacing-y-3 border border-white rounded-lg p-5 text-center">
+            <table className="border-separate border-spacing-x-2 sm:border-spacing-x-10 border-spacing-y-3 border border-white rounded-lg p-5 text-center">
               <thead>
                 <tr>
                   <th className="border-2 border-red-500">Eje X</th>
