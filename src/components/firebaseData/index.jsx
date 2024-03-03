@@ -61,9 +61,9 @@ export const FirebaseData = () => {
         {
           label: "Diferencia de tiempo entre cada dato",
           data: diffTime,
-          borderColor: "#34a853",
-          pointBackgroundColor: "#34a853",
-          pointRadius: 2,
+          borderColor: "#8A2BE2",
+          pointBackgroundColor: "#8A2BE2",
+          pointRadius: 1,
           showLine: false,
         },
       ],
@@ -84,59 +84,59 @@ export const FirebaseData = () => {
         </p>
       </div>
 
-      <div className="p-3 flex flex-col gap-10 items-center m-auto">
-        <div>
+      <div className="sm:p-3 flex flex-col gap-10 items-center m-auto w-full">
+        <div className="w-full">
           <h2 className="text-lg font-bold text-center mb-5">
             Datos del registro
           </h2>
-          <div className="w-[1000px] h-full bg-white m-auto p-5 rounded-3xl">
+          <div className="bg-white m-auto p-5 rounded-xl sm:rounded-3xl">
             <LineChart chartData={graphData} />
           </div>
         </div>
 
-        <div>
+        <div className="w-full">
           <h2 className="text-lg font-bold text-center mb-5">
             Precisión del registro
           </h2>
-          <div className="w-[1000px] h-full bg-white m-auto p-5 rounded-3xl">
+          <div className="bg-white m-auto p-5 rounded-xl sm:rounded-3xl">
             <LineChart chartData={grahpAccuracy} />
           </div>
         </div>
+      </div>
 
-        <div className="mt-5 flex flex-col">
-          <button
-            type="button"
-            className="mb-10 text-white hover:text-white border border-white hover:bg-gray-900 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800"
-            onClick={() => setShowData(!showData)}
-          >
-            Mostrar Datos
-          </button>
+      <div className="mt-5 flex flex-col">
+        <button
+          type="button"
+          className="mb-10 text-white hover:text-white border border-white hover:bg-gray-900 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800"
+          onClick={() => setShowData(!showData)}
+        >
+          Mostrar Datos
+        </button>
 
-          {showData && (
-            <div>
-              <table className="border-separate border-spacing-x-10 border-spacing-y-3 border border-white rounded-lg p-5 text-center">
-                <thead>
-                  <tr>
-                    <th className="border-2 border-red-500">Eje X</th>
-                    <th className="border-2 border-red-500">Eje Y</th>
-                    <th className="border-2 border-red-500">Eje Z</th>
-                    <th className="border-2 border-red-500">Time</th>
+        {showData && (
+          <div>
+            <table className="border-separate border-spacing-x-10 border-spacing-y-3 border border-white rounded-lg p-5 text-center">
+              <thead>
+                <tr>
+                  <th className="border-2 border-red-500">Eje X</th>
+                  <th className="border-2 border-red-500">Eje Y</th>
+                  <th className="border-2 border-red-500">Eje Z</th>
+                  <th className="border-2 border-red-500">Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sensorData.map((entry, index) => (
+                  <tr key={index}>
+                    <td>{entry.dataX}</td>
+                    <td>{entry.dataY}</td>
+                    <td>{entry.dataZ}</td>
+                    <td>{entry.currentTime}</td>
                   </tr>
-                </thead>
-                <tbody>
-                  {sensorData.map((entry, index) => (
-                    <tr key={index}>
-                      <td>{entry.dataX}</td>
-                      <td>{entry.dataY}</td>
-                      <td>{entry.dataZ}</td>
-                      <td>{entry.currentTime}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </>
   );
