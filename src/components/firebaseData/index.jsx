@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchDataFromFirebase } from "../../fetchData/fetchDataFromFirebase";
+import { getAccelDataFromFirebase } from "../../fetchData/fetchDataFromFirebase";
 import { LineChart } from "../../components/lineChart";
 
 export const FirebaseData = () => {
@@ -7,6 +7,7 @@ export const FirebaseData = () => {
   const [sensorData, setSensorData] = useState([]);
   const [maxValues, setMaxValues] = useState([]);
   const [startTime, setStartTime] = useState(null);
+  const [endTime, setEndTime] = useState(null);
   const [diffTime, setDiffTime] = useState([]);
   const [graphData, setGraphData] = useState({
     labels: [],
@@ -18,11 +19,12 @@ export const FirebaseData = () => {
   });
 
   useEffect(() => {
-    fetchDataFromFirebase().then(
-      ({ sensorData, maxValues, startTime, difMilSec }) => {
+    getAccelDataFromFirebase().then(
+      ({ sensorData, maxValues, startTime, endTime, difMilSec }) => {
         setSensorData(sensorData);
         setMaxValues(maxValues);
         setStartTime(startTime);
+        setEndTime(endTime);
         setDiffTime(difMilSec);
       },
     );
@@ -77,6 +79,7 @@ export const FirebaseData = () => {
           Información sobre el registro
         </h2>
         <p>Hora de inicio (UTC-0): {startTime}</p>
+        <p>Hora de fin (UTC-0): {endTime}</p>
         <p>Número de datos: {sensorData.length}</p>
         <p>Unidad: cm/s2</p>
         <p>
