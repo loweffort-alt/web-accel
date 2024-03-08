@@ -37,10 +37,12 @@ export async function getInfoDeviceFromFirebase() {
   }
 }
 
-const infoDeviceFromFirebase = await getInfoDeviceFromFirebase();
-const infoDeviceIdArray = infoDeviceFromFirebase.deviceId;
+//const infoDeviceFromFirebase = await getInfoDeviceFromFirebase();
+//const infoDeviceIdArray = infoDeviceFromFirebase.deviceId;
 
 export async function getAccelDataFromFirebase() {
+  const infoDeviceFromFirebase = await getInfoDeviceFromFirebase();
+  const infoDeviceIdArray = infoDeviceFromFirebase.deviceId;
   let accelDataFromFirebase;
   for (const deviceId of infoDeviceIdArray) {
     const snapshot = await get(child(databaseRef, `${deviceId}`));
