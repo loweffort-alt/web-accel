@@ -9,7 +9,6 @@ export const DeviceInfo = () => {
     getInfoDeviceFromFirebase().then(({ deviceInfo, deviceId }) => {
       setDeviceInfo(deviceInfo);
       setDeviceId(deviceId);
-      console.log(deviceInfo);
     });
   }, []);
 
@@ -33,7 +32,21 @@ export const DeviceInfo = () => {
         </p>
         <p>Canales: X Y Z</p>
         <p>Frecuencia de muestreo(Hz): 100.0</p>
-        <p>Coordenadas: xxx</p>
+        <p>
+          Coordenadas:
+          <br />
+          Latitud:{" "}
+          {deviceInfo[0]
+            ? deviceInfo[0].currentLocation.latitude
+            : "No data"}{" "}
+          <br />
+          Longitud:{" "}
+          {deviceInfo[0] ? deviceInfo[0].currentLocation.longitude : "No data"}
+          <br />
+          Altitud:{" "}
+          {deviceInfo[0] ? deviceInfo[0].currentLocation.altitude : "No data"}
+          <br />
+        </p>
       </div>
     </>
   );

@@ -32,7 +32,7 @@ export const FirebaseData = () => {
 
   useEffect(() => {
     setGraphData({
-      labels: sensorData.map((e) => e.currentTime),
+      labels: sensorData.map((e, i) => i),
       datasets: [
         {
           label: "Eje X",
@@ -72,6 +72,41 @@ export const FirebaseData = () => {
     });
   }, [sensorData]);
 
+  function generateBlob() {
+    const csvLines = [];
+    if (sensorData[0]) {
+      const accelDataCSV = sensorData;
+      //const devicesDataCSV = dev
+      const headers = Object.keys(accelDataCSV[0]).join(",");
+      csvLines.push(headers);
+
+      accelDataCSV.forEach((obj) => {
+        const row = Object.values(obj).join(",");
+        csvLines.push(row);
+      });
+
+      const csvString = csvLines.join("\n");
+
+      const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+
+      return blob;
+    } else {
+      console.log("no hay datos");
+      return null;
+    }
+  }
+
+  function downLoadDataCSV() {
+    const blob = generateBlob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "datosAccel.csv"); // Nombre del archivo
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
   return (
     <>
       <div className="border-white border-2 rounded-xl p-3 flex flex-col gap-2 m-auto">
@@ -86,6 +121,13 @@ export const FirebaseData = () => {
           Aceleraciones máximas: {maxValues[0]} {maxValues[1]} {maxValues[2]}
         </p>
       </div>
+
+      <button
+        onClick={() => downLoadDataCSV()}
+        className="bg-yellow-800 rounded-xl w-36 h-10 m-auto font-bold"
+      >
+        Descargar CSV
+      </button>
 
       <div className="sm:p-3 flex flex-col gap-10 items-center m-auto w-full">
         <div className="w-full">

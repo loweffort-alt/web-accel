@@ -4,16 +4,9 @@ import { getDatabase, ref, child, get } from "firebase/database";
 const databaseRef = ref(getDatabase(app));
 
 function calcularDiferenciasDeTiempoEnMilisegundos(arrayDeTiempos) {
-  const tiemposEnDate = arrayDeTiempos.map((tiempo) => {
-    const [horas, minutos, segundos, milisegundos] = tiempo
-      .split(/[:.]/)
-      .map(Number);
-    return new Date(0, 0, 0, horas, minutos, segundos, milisegundos);
-  });
-
   const diferenciasEnMilisegundos = [];
-  for (let i = 1; i < tiemposEnDate.length; i++) {
-    const diferenciaEnMilisegundos = tiemposEnDate[i] - tiemposEnDate[i - 1];
+  for (let i = 1; i < arrayDeTiempos.length; i++) {
+    const diferenciaEnMilisegundos = arrayDeTiempos[i] - arrayDeTiempos[i - 1];
     diferenciasEnMilisegundos.push(diferenciaEnMilisegundos / 1000);
   }
 
@@ -30,6 +23,7 @@ export async function getInfoDeviceFromFirebase() {
       deviceModel: el.deviceModel,
       appVersion: el.appVersion,
       deviceSDKVersion: el.deviceSDKVersion,
+      currentLocation: el.currentLocation,
     }));
     return { deviceId, deviceInfo };
   } else {
@@ -47,12 +41,12 @@ export async function getAccelDataFromFirebase() {
   for (const deviceId of infoDeviceIdArray) {
     const snapshot = await get(child(databaseRef, `${deviceId}`));
     if (snapshot.exists()) {
-      const rawData = snapshot.val();
+      const rawData = snapshot.val().sismicData;
       const filteredData = Object.values(rawData).map((el, i) => ({
-        dataX: parseFloat(el.dataX),
-        dataY: parseFloat(el.dataY),
-        dataZ: parseFloat(el.dataZ),
-        currentTime: el.currentTime,
+        dataX: parseFloat(el.x),
+        dataY: parseFloat(el.y),
+        dataZ: parseFloat(el.z),
+        currentTime: el.timestamp,
         numberData: i,
       }));
       const maxValues = ["dataX", "dataY", "dataZ"].map((axis) =>
