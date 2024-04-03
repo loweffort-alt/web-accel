@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getInfoDeviceFromFirebase } from "../../fetchData/fetchDataFromFirebase";
+import { DropDown } from "./dropDown";
 
 export const DeviceInfo = () => {
   const [deviceInfo, setDeviceInfo] = useState([]);
@@ -16,6 +17,7 @@ export const DeviceInfo = () => {
     <>
       <div className="border-white border-2 rounded-xl p-3 flex flex-col gap-2">
         <h2 className="text-lg font-bold text-center">Estación sísmica</h2>
+        <DropDown devices={deviceInfo} />
         <p>
           Dispositivo:
           {deviceInfo[0]
