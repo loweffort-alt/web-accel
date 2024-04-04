@@ -17,15 +17,15 @@ export async function getInfoDeviceFromFirebase() {
   const snapshot = await get(child(databaseRef, "infoDevice"));
   if (snapshot.exists()) {
     const rawData = snapshot.val();
-    const deviceId = Object.keys(rawData);
-    const deviceInfo = Object.values(rawData).map((el) => ({
-      deviceManufacturer: el.deviceManufacturer,
-      deviceModel: el.deviceModel,
-      appVersion: el.appVersion,
-      deviceSDKVersion: el.deviceSDKVersion,
-      currentLocation: el.currentLocation,
+    const firebaseDeviceInfo = Object.entries(rawData).map((el) => ({
+      id: el[0],
+      deviceManufacturer: el[1].deviceManufacturer,
+      deviceModel: el[1].deviceModel,
+      appVersion: el[1].appVersion,
+      deviceSDKVersion: el[1].deviceSDKVersion,
+      currentLocation: el[1].currentLocation,
     }));
-    return { deviceId, deviceInfo };
+    return { firebaseDeviceInfo };
   } else {
     throw new Error("No data available");
   }
@@ -33,13 +33,13 @@ export async function getInfoDeviceFromFirebase() {
 
 //const infoDeviceFromFirebase = await getInfoDeviceFromFirebase();
 //const infoDeviceIdArray = infoDeviceFromFirebase.deviceId;
+const wea = {
+  id: "none",
+};
 
-export async function getAccelDataFromFirebase() {
-  const infoDeviceFromFirebase = await getInfoDeviceFromFirebase();
-  const infoDeviceIdArray = infoDeviceFromFirebase.deviceId;
-  let accelDataFromFirebase;
-  for (const deviceId of infoDeviceIdArray) {
-    const snapshot = await get(child(databaseRef, `${deviceId}`));
+export async function getAccelDataFromFirebase(selectedDevice = wea) {
+  try {
+    const snapshot = await get(child(databaseRef, `${selectedDevice.id}`));
     if (snapshot.exists()) {
       const rawData = snapshot.val().sismicData;
       const filteredData = Object.values(rawData).map((el, i) => ({
@@ -61,7 +61,7 @@ export async function getAccelDataFromFirebase() {
         filteredData.length > 0
           ? filteredData[filteredData.length - 1].currentTime
           : null;
-      accelDataFromFirebase = {
+      return {
         sensorData: filteredData,
         maxValues,
         startTime,
@@ -69,8 +69,53 @@ export async function getAccelDataFromFirebase() {
         difMilSec,
       };
     } else {
-      throw new Error("No data available");
+      return {
+        sensorData: [],
+        maxValues: [],
+        startTime: null,
+        endTime: null,
+        difMilSec: [],
+      };
     }
+  } catch (error) {
+    console.log(error);
   }
-  return accelDataFromFirebase;
+  //const infoDeviceFromFirebase = await getInfoDeviceFromFirebase();
+  //const infoDeviceIdArray = infoDeviceFromFirebase.firebaseDe;
+  //let accelDataFromFirebase;
+  //for (const deviceId of infoDeviceIdArray) {
+  //const snapshot = await get(child(databaseRef, `${selectedDevice}`));
+  //if (snapshot.exists()) {
+  //const rawData = snapshot.val().sismicData;
+  //const filteredData = Object.values(rawData).map((el, i) => ({
+  //dataX: parseFloat(el.x),
+  //dataY: parseFloat(el.y),
+  //dataZ: parseFloat(el.z),
+  //currentTime: el.timestamp,
+  //numberData: i,
+  //}));
+  //const maxValues = ["dataX", "dataY", "dataZ"].map((axis) =>
+  //Math.max(...filteredData.map((entry) => Math.abs(entry[axis]))),
+  //);
+  //const arrayMiliseconds = filteredData.map((el) => el.currentTime);
+  //const difMilSec =
+  //calcularDiferenciasDeTiempoEnMilisegundos(arrayMiliseconds);
+  //const startTime =
+  //filteredData.length > 0 ? filteredData[0].currentTime : null;
+  //const endTime =
+  //filteredData.length > 0
+  //? filteredData[filteredData.length - 1].currentTime
+  //: null;
+  //accelDataFromFirebase = {
+  //sensorData: filteredData,
+  //maxValues,
+  //startTime,
+  //endTime,
+  //difMilSec,
+  //};
+  //} else {
+  //throw new Error("No data available");
+  //}
+  //}
+  //return accelDataFromFirebase;
 }

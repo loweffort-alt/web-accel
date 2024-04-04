@@ -1,36 +1,30 @@
-import { useEffect, useState } from "react";
-import { getInfoDeviceFromFirebase } from "../../fetchData/fetchDataFromFirebase";
 import { DropDown } from "./dropDown";
 
-export const DeviceInfo = () => {
-  const [deviceInfo, setDeviceInfo] = useState([]);
-  const [deviceId, setDeviceId] = useState([]);
-
-  useEffect(() => {
-    getInfoDeviceFromFirebase().then(({ deviceInfo, deviceId }) => {
-      setDeviceInfo(deviceInfo);
-      setDeviceId(deviceId);
-    });
-  }, []);
+export const DeviceInfo = ({ selectedDevice, setSelectedDevice }) => {
+  function handlerDeviceSelection(device) {
+    setSelectedDevice(device);
+  }
 
   return (
     <>
       <div className="border-white border-2 rounded-xl p-3 flex flex-col gap-2">
         <h2 className="text-lg font-bold text-center">Estación sísmica</h2>
-        <DropDown devices={deviceInfo} />
+        <DropDown onSelectDevice={handlerDeviceSelection} />
         <p>
           Dispositivo:
-          {deviceInfo[0]
-            ? deviceInfo[0].deviceManufacturer + " " + deviceInfo[0].deviceModel
+          {selectedDevice
+            ? selectedDevice.deviceManufacturer +
+              " " +
+              selectedDevice.deviceModel
             : "No data"}
         </p>
         <p>
           Versión de la app:
-          {deviceInfo[0] ? deviceInfo[0].appVersion : "No data"}
+          {selectedDevice ? selectedDevice.appVersion : "No data"}
         </p>
         <p>
           Versión del SDK:
-          {deviceInfo[0] ? deviceInfo[0].deviceSDKVersion : "No data"}
+          {selectedDevice ? selectedDevice.deviceSDKVersion : "No data"}
         </p>
         <p>Canales: X Y Z</p>
         <p>Frecuencia de muestreo(Hz): 100.0</p>
@@ -38,15 +32,19 @@ export const DeviceInfo = () => {
           Coordenadas:
           <br />
           Latitud:{" "}
-          {deviceInfo[0]
-            ? deviceInfo[0].currentLocation.latitude
-            : "No data"}{" "}
+          {selectedDevice
+            ? selectedDevice.currentLocation?.latitude
+            : "No data"}
           <br />
           Longitud:{" "}
-          {deviceInfo[0] ? deviceInfo[0].currentLocation.longitude : "No data"}
+          {selectedDevice
+            ? selectedDevice.currentLocation?.longitude
+            : "No data"}
           <br />
           Altitud:{" "}
-          {deviceInfo[0] ? deviceInfo[0].currentLocation.altitude : "No data"}
+          {selectedDevice
+            ? selectedDevice.currentLocation?.altitude
+            : "No data"}
           <br />
         </p>
       </div>

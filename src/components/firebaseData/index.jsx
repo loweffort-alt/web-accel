@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { getAccelDataFromFirebase } from "../../fetchData/fetchDataFromFirebase";
 import { LineChart } from "../../components/lineChart";
 
-export const FirebaseData = () => {
+export const FirebaseData = ({ selectedDevice }) => {
   const [showData, setShowData] = useState(false);
   const [sensorData, setSensorData] = useState([]);
   const [maxValues, setMaxValues] = useState([]);
@@ -19,16 +19,20 @@ export const FirebaseData = () => {
   });
 
   useEffect(() => {
-    getAccelDataFromFirebase().then(
-      ({ sensorData, maxValues, startTime, endTime, difMilSec }) => {
-        setSensorData(sensorData);
-        setMaxValues(maxValues);
-        setStartTime(startTime);
-        setEndTime(endTime);
-        setDiffTime(difMilSec);
-      },
-    );
-  }, []);
+    try {
+      getAccelDataFromFirebase(selectedDevice).then(
+        ({ sensorData, maxValues, startTime, endTime, difMilSec }) => {
+          setSensorData(sensorData);
+          setMaxValues(maxValues);
+          setStartTime(startTime);
+          setEndTime(endTime);
+          setDiffTime(difMilSec);
+        },
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  }, [selectedDevice]);
 
   useEffect(() => {
     setGraphData({
@@ -70,7 +74,7 @@ export const FirebaseData = () => {
         },
       ],
     });
-  }, [sensorData]);
+  }, [selectedDevice, sensorData]);
 
   function generateBlob() {
     const csvLines = [];
@@ -98,14 +102,20 @@ export const FirebaseData = () => {
 
   function downLoadDataCSV() {
     const blob = generateBlob();
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "datosAccel.csv"); // Nombre del archivo
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    if (blob) {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "datosAccel.csv"); // Nombre del archivo
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      alert("No data on device");
+    }
   }
+
+  const noData = "No data on device";
 
   return (
     <>
@@ -113,12 +123,19 @@ export const FirebaseData = () => {
         <h2 className="text-lg font-bold text-center">
           Información sobre el registro
         </h2>
-        <p>Hora de inicio (UTC-0): {startTime}</p>
-        <p>Hora de fin (UTC-0): {endTime}</p>
-        <p>Número de datos: {sensorData.length}</p>
+        <p>Hora de inicio (UTC-0): {startTime ? startTime : noData}</p>
+        <p>Hora de fin (UTC-0): {endTime ? endTime : noData}</p>
+        <p>Número de datos: {sensorData[0] ? sensorData.length : noData}</p>
         <p>Unidad: cm/s2</p>
         <p>
-          Aceleraciones máximas: {maxValues[0]} {maxValues[1]} {maxValues[2]}
+          Aceleraciones máximas
+          <br />
+          Eje X: {maxValues[0] ? maxValues[0] : noData}
+          <br />
+          Eje Y: {maxValues[0] ? maxValues[1] : noData}
+          <br />
+          Eje Z: {maxValues[0] ? maxValues[2] : noData}
+          <br />
         </p>
       </div>
 
